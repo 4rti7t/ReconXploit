@@ -1,4 +1,4 @@
-# Automated Hacking Tool
+# ReconXploit (Automated Machines Hacking Tool)
 
 ## 🚀 Overview
 The **Automated Hacking Tool** is designed to streamline the penetration testing process by automating tasks such as scanning, enumeration, vulnerability detection, exploitation, and post-exploitation. This tool is ideal for ethical hackers and cybersecurity professionals looking to enhance their workflow.
