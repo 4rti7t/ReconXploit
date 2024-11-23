@@ -37,7 +37,8 @@ The **Automated Hacking Tool** is designed to streamline the penetration testing
 
 2. Install the required Python modules:
    ```bash
-   pip install -r requirements.txt
+   pip install nmap
+   pip install python-nmap
    ```
 
    ![Screenshot from 2024-11-23 18-33-45](https://github.com/user-attachments/assets/18ffea76-efe8-403f-bfa9-10c81c4544a6)
