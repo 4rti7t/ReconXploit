@@ -33,14 +33,15 @@ The **Automated Hacking Tool** is designed to streamline the penetration testing
    cd ReconXploit
    ```
    
-   ![Clone Repository Screenshot](screenshots/clone-repo.png)
+   ![Screenshot from 2024-11-23 18-27-19](https://github.com/user-attachments/assets/6c955800-3d87-4751-ad0d-5bb77ffb6590)
 
 2. Install the required Python modules:
    ```bash
    pip install -r requirements.txt
    ```
 
-   ![Install Requirements Screenshot](screenshots/install-requirements.png)
+   ![Screenshot from 2024-11-23 18-33-45](https://github.com/user-attachments/assets/18ffea76-efe8-403f-bfa9-10c81c4544a6)
+
 
 3. Ensure the necessary tools (Nmap, Nikto, Gobuster, etc.) are installed and accessible from your terminal.
 
@@ -51,8 +52,9 @@ The **Automated Hacking Tool** is designed to streamline the penetration testing
    ```bash
    python3 ReconXploit.py
    ```
+![Screenshot from 2024-11-23 18-36-29](https://github.com/user-attachments/assets/8b5b600f-5c8b-4f76-aa47-cf9a31083913)
 
-   ![Run Script Screenshot](screenshots/run-script.png)
+   
 
 2. Follow the menu options to:
    - 🔍 Scan a target.
@@ -63,23 +65,31 @@ The **Automated Hacking Tool** is designed to streamline the penetration testing
 
 ---
 
-## 📖 Menu Options
-1. **Scan Target**: Perform a network scan on the specified IP to identify open ports and services.
-   ![Scan Target Screenshot](screenshots/scan-target.png)
+## 📖 **Menu Options:**
+![Screenshot from 2024-11-23 18-36-55](https://github.com/user-attachments/assets/77c425d1-041d-4b86-91d6-ae86d3f3fb81)
 
-2. **Enumerate Services**: Use tools like Nikto and Gobuster to gather additional information.
-   ![Enumerate Services Screenshot](screenshots/enumerate-services.png)
 
-3. **Search for Vulnerabilities**: Search for known vulnerabilities using Searchsploit.
-   ![Search Vulnerabilities Screenshot](screenshots/search-vulnerabilities.png)
+1. **Scan Target**:
+    Perform a network scan on the specified IP to identify open ports and services.
+   
 
-4. **Exploit Target**: Exploit discovered vulnerabilities using Metasploit.
-   ![Exploit Target Screenshot](screenshots/exploit-target.png)
+3. **Enumerate Services**:
+   Use tools like Nikto and Gobuster to gather additional information.
+   
 
-5. **Post-Exploitation**: Collect system details and resource usage for further analysis.
-   ![Post-Exploitation Screenshot](screenshots/post-exploitation.png)
+5. **Search for Vulnerabilities**:
+   Search for known vulnerabilities using Searchsploit.
+   
+7. **Exploit Target**:
+    Exploit discovered vulnerabilities using Metasploit.
+   
 
-6. **Exit**: Exit the program.
+9. **Post-Exploitation**:
+    Collect system details and resource usage for further analysis.
+   
+
+11. **Exit**:
+    Exit the program.
 
 ---
 
@@ -98,11 +108,13 @@ Contributions are welcome! To contribute:
 ---
 
 ## 📜 **License**
+
 This project is licensed under the MIT License. See the `LICENSE` file for details.
 
 ---
 
 ## 📞 **Support**
+
 For any issues, feel free to open an issue on GitHub or contact us at arti7tofficial@gmail.com.
 
 ---
