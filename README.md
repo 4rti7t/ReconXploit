@@ -29,8 +29,8 @@ The **Automated Hacking Tool** is designed to streamline the penetration testing
 ## 📥 Installation
 1. Clone this repository:
    ```bash
-   git clone https://github.com/your-repo/automated-hacking-tool.git
-   cd automated-hacking-tool
+   git clone https://github.com/4rti7t/ReconXploit.git
+   cd ReconXploit
    ```
    
    ![Clone Repository Screenshot](screenshots/clone-repo.png)
@@ -49,7 +49,7 @@ The **Automated Hacking Tool** is designed to streamline the penetration testing
 ## 🛠️ Usage
 1. Run the script:
    ```bash
-   python3 automated_hacking_tool.py
+   python3 ReconXploit.py
    ```
 
    ![Run Script Screenshot](screenshots/run-script.png)
@@ -103,7 +103,7 @@ This project is licensed under the MIT License. See the `LICENSE` file for detai
 ---
 
 ## 📞 **Support**
-For any issues, feel free to open an issue on GitHub or contact us at support@example.com.
+For any issues, feel free to open an issue on GitHub or contact us at arti7tofficial@gmail.com.
 
 ---
 
